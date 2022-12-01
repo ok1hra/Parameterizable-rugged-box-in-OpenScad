@@ -1,6 +1,9 @@
 # Parameterizable rugged box in OpenScad
+- waterproof
+- without nuts (tapered holes)
+- inside the mounting posts
+- variant hinge/clip only
 
-3D print model
 
 ![preview](preview.png)
 
