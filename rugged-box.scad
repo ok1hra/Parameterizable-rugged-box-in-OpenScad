@@ -1,66 +1,80 @@
-//-------------------------------------------------------------------
-// title: Parametrizable rugged box
-// author: OK1HRA 
-// license: Creative Commons BY-SA
-// URL: http://remoteqth.com/
-// revision: 0.1
-// format: OpenSCAD
-//-------------------------------------------------------------------
-// HowTo:
-// After open change inputs parameters and press F5
-// .STL export press F6 and menu /Design/Export as STL...
-//-------------------------------------------------------------------
-// Changelog:
-//      2022-11-27  initial version
-//----------------- Input parameter ---------------------------------
+/*
+    Parametric 3D print Rugged box
+    © 2010 by OK1HRA https://remoteqth.com/3d-rugged-box.php
+    Creative Commons BY-SA
+ -------------------------------------------------------------------
+     How to export .stl
+     After open change inputs parameters
+      - set arangeForPrint to 1
+     and press F5 for preview
+     .STL export press F6 and F7 (or menu /Design/Export as STL...)
+
+     How to export .dxf for lasercuter front panel
+      - set enableBOTinside to 1
+      - set arangeForPrint to 1
+      - set DXFexport to 1
+     - render [F6]
+     - menu File/Export/ExportDXF
+
+     ----------------- Input parameter ---------------------------------*/
 
 // inner sizes in mm
-width =                 160;
-depth =                 105;
-thickness =           3.5;
+width =                 160;            // inner size mm
+depth =                 105;            // inner size mm
+thickness =           3.5;            // box thickness mm
 
 // top part
-heightTOP = 4*thickness;     // >=4*thickness
+heightTOP = 4*thickness;   // must be bigger than 4 x thickness variable
 
 // bottom part
-heightBOT =   38;     // > 7*thickness
+heightBOT = 38;                    // must be bigget than 7 x thickness variable
 
-boltLength = 30;
-widthCLIP = boltLength/2-0.6;       // calculate by boltLength
-widthCLIPsupport = boltLength/4;       // calculate by boltLength
+boltLength = 30;                    // length your bolt M3
+widthCLIP = boltLength/2-0.6;       // calculate by boltLength, do not change
+widthCLIPsupport = boltLength/4;       // calculate by boltLength, do not change
 
 // diameter in mm of the bolt hole (conical holes for screw without nuts)
-diameterCLIP = 3;   // <= thickness
+diameterCLIP = 3;                   // must be smaller than thickness variable
 
 // for clips on both sides
-disableHINGE = 0;   // [0:1]
+disableHINGE = 0;   // [0:1] by your prefer
 
-enableTOPinside =   0;   // [0:1]
-enableBOTinside =   1;   // [0:1]
+enableTOPinside = 0;   // [0:1] customize inside
+enableBOTinside = 1;   // [0:1] customize inside
 
-arangeForPrint  = 1;   // [0:1]
-openingAngle = 90;   // [0:220]
+arangeForPrint  = 0;    // [0:1] for render to print must be 1
+DXFexport = 0;              // [0:1] for .DXF export panel only
+openingAngle = 90+30;      // [0:220] for preview only
 
 //-------------------------------------------------------------------
 
+FrontPanelEmbedmentDepth = 3;
+FrontPanelScrewDia = 3;
+
 module TOPinside(){
-    fourSupport(3,10);      // screw dia, height
+    fourSupport(FrontPanelScrewDia,heightTOP-FrontPanelEmbedmentDepth);      // screw dia, height
 }
 
 module BOTinside(){
-    difference(){
-        fourSupport(3,35);      // screw dia, height
-            difference(){
-                translate([0,0,thickness+heightBOT-1.0*thickness])  layer(width,depth,thickness*6.5, thickness*7, 1*thickness+0.1, thickness);
-                translate([0,0,thickness+heightBOT-1.0*thickness])  layer(width,depth,thickness*5.5, thickness*5, 1*thickness+0.1, thickness);
-            }
-        }
+        fourSupport(FrontPanelScrewDia,heightBOT-FrontPanelEmbedmentDepth);      // screw dia, height
 }
 
 //-------------------------------------------------------------------
 
 if(arangeForPrint==1){
 
+    if(DXFexport==1&&enableBOTinside==1){
+        // panel
+        projection(cut=true) translate([0,0,-FrontPanelEmbedmentDepth/2])
+            difference(){
+                layer(width,depth,thickness*4-0.4, thickness*4-0.4, FrontPanelEmbedmentDepth, thickness);
+                translate([width/2-2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                translate([-width/2+2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                translate([width/2-2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                translate([-width/2+2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+            }
+
+    }else{
         translate([width/2+5*thickness,0,0]) rotate([0,0,-90]) rotate([0,90,0]) translate([-width*0.25-widthCLIP/2,-depth/2-2.5*thickness+1.125*diameterCLIP,-thickness-heightBOT+5.0*thickness+(1.25*diameterCLIP)/2])
         clip(width,depth,heightBOT,thickness, 0.5);
     
@@ -81,8 +95,21 @@ if(arangeForPrint==1){
         box(width,depth,heightTOP,thickness,1);
 
         box(width,depth,heightBOT,thickness,0);
+    }
 
 }else{
+    if(enableBOTinside==1){
+        // panel
+%    translate([0,depth/2+3.5*thickness,-FrontPanelEmbedmentDepth])
+        difference(){
+            layer(width,depth,thickness*4-0.4, thickness*4-0.4, FrontPanelEmbedmentDepth, thickness);
+            translate([width/2-2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+            translate([-width/2+2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+            translate([width/2-2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+            translate([-width/2+2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+        }
+    }
+
         rotate([openingAngle,0,0]) translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) clip(width,depth,heightBOT,thickness, 0.5);
         rotate([openingAngle,0,0]) translate([-width/2,depth/2+3.5*thickness,-thickness-heightBOT]) clip(width,depth,heightBOT,thickness, 0.5);
         if(disableHINGE ==1){
@@ -95,7 +122,8 @@ if(arangeForPrint==1){
         box(width,depth,heightTOP,thickness,1);
 
         translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) box(width,depth,heightBOT,thickness,0);
-
+        
+//        %translate([0, depth/2+3.5*thickness, -1.5]) rotate([0,0,180]) linear_extrude(height = 3, center = true, convexity = 10) import (file = "remoterig.dxf", layer = "0");
 }
 
 module clip(XX,YY,ZZ,WALL,hump){
@@ -314,31 +342,59 @@ module layer(XX,YY,D1,D2,ZZ,WALL){
 
 module fourSupport(SCREWDIA,ZZ){
     difference(){
+        // four support
         union(){
-            hull(){
-                translate([width/2-2*thickness,depth/2-2*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
-                translate([width/2-1*thickness,depth/2-1*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+            difference(){
+                union(){
+                    hull(){
+                        translate([width/2-2*thickness,depth/2-2*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+                        translate([width/2-1*thickness,depth/2-1*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+                    }
+                    hull(){
+                        translate([width/2-2*thickness,-depth/2+2*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+                        translate([width/2-1*thickness,-depth/2+1*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+                    }
+                    hull(){
+                        translate([-width/2+2*thickness,depth/2-2*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+                        translate([-width/2+1*thickness,depth/2-1*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+                    }
+                    hull(){
+                        translate([-width/2+2*thickness,-depth/2+2*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+                        translate([-width/2+1*thickness,-depth/2+1*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
+                    }
+                }
+                translate([width/2-2*thickness,depth/2-2*thickness,thickness+0.1]) cylinder(h=ZZ, d=SCREWDIA-0.3, center=false, $fn=60);
+                    translate([width/2-2*thickness,depth/2-2*thickness,thickness+ZZ-4.9]) cylinder(h=5, d1=SCREWDIA-0.3, d2=SCREWDIA+0.2, center=false, $fn=60);
+                translate([width/2-2*thickness,-depth/2+2*thickness,thickness+0.1]) cylinder(h=ZZ, d=SCREWDIA-0.3, center=false, $fn=60);
+                    translate([width/2-2*thickness,-depth/2+2*thickness,thickness+0.1]) cylinder(h=5, d1=SCREWDIA-0.3, d2=SCREWDIA+0.2, center=false, $fn=60);
+                translate([-width/2+2*thickness,depth/2-2*thickness,thickness+0.1]) cylinder(h=ZZ, d=SCREWDIA-0.3, center=false, $fn=60);
+                    translate([-width/2+2*thickness,depth/2-2*thickness,thickness+0.1]) cylinder(h=5, d1=SCREWDIA-0.3, d2=SCREWDIA+0.2, center=false, $fn=60);
+                translate([-width/2+2*thickness,-depth/2+2*thickness,thickness+0.1]) cylinder(h=ZZ, d=SCREWDIA-0.3, center=false, $fn=60);
+                    translate([-width/2+2*thickness,-depth/2+2*thickness,thickness+0.1]) cylinder(h=5, d1=SCREWDIA-0.3, d2=SCREWDIA+0.2, center=false, $fn=60);
             }
-            hull(){
-                translate([width/2-2*thickness,-depth/2+2*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
-                translate([width/2-1*thickness,-depth/2+1*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
-            }
-            hull(){
-                translate([-width/2+2*thickness,depth/2-2*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
-                translate([-width/2+1*thickness,depth/2-1*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
-            }
-            hull(){
-                translate([-width/2+2*thickness,-depth/2+2*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
-                translate([-width/2+1*thickness,-depth/2+1*thickness,thickness]) cylinder(h=ZZ, d=3*thickness, center=false, $fn=60);
-            }
-        }
-        translate([width/2-2*thickness,depth/2-2*thickness,thickness+0.1]) cylinder(h=ZZ, d=SCREWDIA-0.3, center=false, $fn=60);
-            translate([width/2-2*thickness,depth/2-2*thickness,thickness+ZZ-4.9]) cylinder(h=5, d1=SCREWDIA-0.3, d2=SCREWDIA+0.2, center=false, $fn=60);
-        translate([width/2-2*thickness,-depth/2+2*thickness,thickness+0.1]) cylinder(h=ZZ, d=SCREWDIA-0.3, center=false, $fn=60);
-            translate([width/2-2*thickness,-depth/2+2*thickness,thickness+0.1]) cylinder(h=5, d1=SCREWDIA-0.3, d2=SCREWDIA+0.2, center=false, $fn=60);
-        translate([-width/2+2*thickness,depth/2-2*thickness,thickness+0.1]) cylinder(h=ZZ, d=SCREWDIA-0.3, center=false, $fn=60);
-            translate([-width/2+2*thickness,depth/2-2*thickness,thickness+0.1]) cylinder(h=5, d1=SCREWDIA-0.3, d2=SCREWDIA+0.2, center=false, $fn=60);
-        translate([-width/2+2*thickness,-depth/2+2*thickness,thickness+0.1]) cylinder(h=ZZ, d=SCREWDIA-0.3, center=false, $fn=60);
-            translate([-width/2+2*thickness,-depth/2+2*thickness,thickness+0.1]) cylinder(h=5, d1=SCREWDIA-0.3, d2=SCREWDIA+0.2, center=false, $fn=60);
     }
+
+        difference(){
+            translate([0,0,thickness+heightBOT-1.0*thickness])  layer(width,depth,thickness*6.5, thickness*7, 1*thickness+0.1, thickness);
+            translate([0,0,thickness+heightBOT-1.0*thickness])  layer(width,depth,thickness*5.5, thickness*5, 1*thickness+0.1, thickness);
+            }            
+        // bevel support
+            A=width/2-3*thickness;
+            B=depth/2-3*thickness;
+            C=sqrt( pow(A,2) + pow(B,2) );
+            D=width/2-0.5*thickness;
+            E=depth/2-0.5*thickness;
+            F=sqrt( pow(D,2) + pow(E,2) );
+            translate([0,0,thickness]) cylinder(h=ZZ+0.1,d1=2*F,d2=2*C, $fn=400);
+    }
+        // center support
+        difference(){
+            translate([-5,depth/2,thickness+ZZ]) rotate([180,0,0]) cube([10,thickness,10],center=false);
+            translate([-6,depth/2-thickness,thickness+ZZ]) rotate([180+20,0,0]) cube([12,thickness*1.5,12],center=false);
+        }
+        mirror([0,1,0]) difference(){
+            translate([-5,depth/2,thickness+ZZ]) rotate([180,0,0]) cube([10,thickness,10],center=false);
+            translate([-6,depth/2-thickness,thickness+ZZ]) rotate([180+20,0,0]) cube([12,thickness*1.5,12],center=false);
+        }
+
 }
