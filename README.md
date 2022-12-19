@@ -1,8 +1,8 @@
 # Parameterizable rugged box in OpenScad
-- waterproof
-- without nuts (tapered holes)
-- inside the mounting posts
-- variant hinge/clip only
+- Waterproof (when using a silicone seal)
+- Without nuts (tapered holes)
+- Inside the mounting posts
+- Variant hinge/clip only
 
 
 ![preview](preview.png)
