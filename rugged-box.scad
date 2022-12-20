@@ -75,6 +75,8 @@ if(arangeForPrint==1){
             }
 
     }else{
+        translate([-width/2-5*thickness-10,0,0]) SealingTrowel();
+    
         translate([width/2+5*thickness,0,0]) rotate([0,0,-90]) rotate([0,90,0]) translate([-width*0.25-widthCLIP/2,-depth/2-2.5*thickness+1.125*diameterCLIP,-thickness-heightBOT+5.0*thickness+(1.25*diameterCLIP)/2])
         clip(width,depth,heightBOT,thickness, 0.5);
     
@@ -98,34 +100,57 @@ if(arangeForPrint==1){
     }
 
 }else{
-    if(enableBOTinside==1){
-        // panel
-%    translate([0,depth/2+3.5*thickness,-FrontPanelEmbedmentDepth])
-        difference(){
-            layer(width,depth,thickness*4-0.4, thickness*4-0.4, FrontPanelEmbedmentDepth, thickness);
-            translate([width/2-2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-            translate([-width/2+2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-            translate([width/2-2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-            translate([-width/2+2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+    difference(){
+        union(){
+            if(enableBOTinside==1){
+                // panel
+        %    translate([0,depth/2+3.5*thickness,-FrontPanelEmbedmentDepth])
+                difference(){
+                    layer(width,depth,thickness*4-0.4, thickness*4-0.4, FrontPanelEmbedmentDepth, thickness);
+                    translate([width/2-2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                    translate([-width/2+2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                    translate([width/2-2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                    translate([-width/2+2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                }
+            }
+%        translate([width/2+1.0*thickness, depth/2+2*thickness,0]) rotate([60,0,0]) SealingTrowel();
+
+            rotate([openingAngle,0,0]) translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) clip(width,depth,heightBOT,thickness, 0.5);
+            rotate([openingAngle,0,0]) translate([-width/2,depth/2+3.5*thickness,-thickness-heightBOT]) clip(width,depth,heightBOT,thickness, 0.5);
+            if(disableHINGE ==1){
+                 rotate([openingAngle,0,0]) translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) mirror([0,1,0]) clip(width,depth,heightBOT,thickness, 0.5);
+                 rotate([openingAngle,0,0]) translate([-width/2,depth/2+3.5*thickness,-thickness-heightBOT]) mirror([0,1,0]) clip(width,depth,heightBOT,thickness, 0.5);
+            }
+            rotate([openingAngle,0,0]) translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) 
+            translate([0,0,2*thickness+heightTOP+heightBOT+0]) mirror([0,0,1])
+            box(width,depth,heightTOP,thickness,1);
+            translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) box(width,depth,heightBOT,thickness,0);
         }
+        // -1/2
+//        translate([-width,depth/2,-heightBOT-2*thickness]) cube([width*2, depth*2, (heightTOP+heightBOT)*2]);
     }
-
-        rotate([openingAngle,0,0]) translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) clip(width,depth,heightBOT,thickness, 0.5);
-        rotate([openingAngle,0,0]) translate([-width/2,depth/2+3.5*thickness,-thickness-heightBOT]) clip(width,depth,heightBOT,thickness, 0.5);
-        if(disableHINGE ==1){
-             rotate([openingAngle,0,0]) translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) mirror([0,1,0]) clip(width,depth,heightBOT,thickness, 0.5);
-             rotate([openingAngle,0,0]) translate([-width/2,depth/2+3.5*thickness,-thickness-heightBOT]) mirror([0,1,0]) clip(width,depth,heightBOT,thickness, 0.5);
-        }
-
-        rotate([openingAngle,0,0]) translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) 
-        translate([0,0,2*thickness+heightTOP+heightBOT+0]) mirror([0,0,1])
-        box(width,depth,heightTOP,thickness,1);
-
-        translate([0,depth/2+3.5*thickness,-thickness-heightBOT]) box(width,depth,heightBOT,thickness,0);
-        
-//        %translate([0, depth/2+3.5*thickness, -1.5]) rotate([0,0,180]) linear_extrude(height = 3, center = true, convexity = 10) import (file = "remoterig.dxf", layer = "0");
 }
 
+module SealingTrowel(){
+    hull(){
+        translate([0,20,0]) cylinder(h=4, d=20, $fn=60);
+        translate([-5,0,0]) cube([10, 1, 2],center=false);
+    }
+    rotate([-90,0,0])
+//#    translate([width/2+1.0*thickness, depth/2+2*thickness,0])
+    translate([0,-0.5,-thickness])
+    difference(){
+        intersection() {
+            hull(){
+                translate([0, thickness, 0]) cylinder(h=1*thickness, d1=thickness*0.5, d2=thickness*1, center=false, $fn=30);
+                translate([0, -thickness, 0]) cylinder(h=1*thickness, d1=thickness*0.5, d2=thickness*1, center=false, $fn=30);
+            }
+            cube([thickness*1.5, 1, thickness*3],center=true);
+        }
+        cube([thickness*1.5, 1.1, thickness+0.1*2],center=true);
+    }
+}    
+    
 module clip(XX,YY,ZZ,WALL,hump){
     difference(){
         union(){
