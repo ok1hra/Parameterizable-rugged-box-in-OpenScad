@@ -21,7 +21,7 @@
 // inner sizes in mm
 width =                 116.4;            // inner size mm
 depth =                 88.4;            // inner size mm
-thickness =           3.5;            // box thickness mm
+thickness =           3.5;            // [>3.5] box thickness mm
 
 // top part
 heightTOP = 22+8+27;   // must be bigger than 4 x thickness variable
@@ -29,7 +29,7 @@ heightTOP = 22+8+27;   // must be bigger than 4 x thickness variable
 // bottom part
 heightBOT = 22;                    // must be bigget than 7 x thickness variable
 
-boltLength = 30;                    // length your bolt M3
+boltLength = 30;                    // length your bolt M3 in mm
 widthCLIP = boltLength/2-0.6;       // calculate by boltLength, do not change
 widthCLIPsupport = boltLength/4;       // calculate by boltLength, do not change
 
