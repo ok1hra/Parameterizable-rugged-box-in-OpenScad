@@ -19,15 +19,15 @@
      ----------------- Input parameter ---------------------------------*/
 
 // inner sizes in mm
-width =                 160;            // inner size mm
-depth =                 105;            // inner size mm
+width =                 116.4;            // inner size mm
+depth =                 88.4;            // inner size mm
 thickness =           3.5;            // box thickness mm
 
 // top part
-heightTOP = 4*thickness;   // must be bigger than 4 x thickness variable
+heightTOP = 22+8+27;   // must be bigger than 4 x thickness variable
 
 // bottom part
-heightBOT = 38;                    // must be bigget than 7 x thickness variable
+heightBOT = 22;                    // must be bigget than 7 x thickness variable
 
 boltLength = 30;                    // length your bolt M3
 widthCLIP = boltLength/2-0.6;       // calculate by boltLength, do not change
@@ -39,24 +39,25 @@ diameterCLIP = 3;                   // must be smaller than thickness variable
 // for clips on both sides
 disableHINGE = 0;   // [0:1] by your prefer
 
-enableTOPinside = 0;   // [0:1] customize inside
+enableTOPinside = 1;   // [0:1] customize inside
 enableBOTinside = 1;   // [0:1] customize inside
 
 arangeForPrint  = 0;    // [0:1] for render to print must be 1
 DXFexport = 0;              // [0:1] for .DXF export panel only
-openingAngle = 90+30;      // [0:220] for preview only
+openingAngle = 120;      // [0:220] for preview only
 
 //-------------------------------------------------------------------
 
-FrontPanelEmbedmentDepth = 3;
+FrontPanelEmbedmentDepthTop = 8+27;
+FrontPanelEmbedmentDepthBot = 2;
 FrontPanelScrewDia = 3;
 
 module TOPinside(){
-    fourSupport(FrontPanelScrewDia,heightTOP-FrontPanelEmbedmentDepth);      // screw dia, height
+    fourSupport(FrontPanelScrewDia,heightTOP-FrontPanelEmbedmentDepthTop);      // screw dia, height
 }
 
 module BOTinside(){
-        fourSupport(FrontPanelScrewDia,heightBOT-FrontPanelEmbedmentDepth);      // screw dia, height
+        fourSupport(FrontPanelScrewDia,heightBOT-FrontPanelEmbedmentDepthBot);      // screw dia, height
 }
 
 //-------------------------------------------------------------------
@@ -65,13 +66,13 @@ if(arangeForPrint==1){
 
     if(DXFexport==1&&enableBOTinside==1){
         // panel
-        projection(cut=true) translate([0,0,-FrontPanelEmbedmentDepth/2])
+        projection(cut=true) translate([0,0,-FrontPanelEmbedmentDepthBot/2])
             difference(){
-                layer(width,depth,thickness*4-0.4, thickness*4-0.4, FrontPanelEmbedmentDepth, thickness);
-                translate([width/2-2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-                translate([-width/2+2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-                translate([width/2-2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-                translate([-width/2+2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                layer(width,depth,thickness*4-0.4, thickness*4-0.4, FrontPanelEmbedmentDepthBot, thickness);
+                translate([width/2-2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepthBot+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                translate([-width/2+2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepthBot+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                translate([width/2-2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepthBot+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                translate([-width/2+2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepthBot+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
             }
 
     }else{
@@ -104,13 +105,13 @@ if(arangeForPrint==1){
         union(){
             if(enableBOTinside==1){
                 // panel
-        %    translate([0,depth/2+3.5*thickness,-FrontPanelEmbedmentDepth])
+        %    translate([0,depth/2+3.5*thickness,-FrontPanelEmbedmentDepthBot])
                 difference(){
-                    layer(width,depth,thickness*4-0.4, thickness*4-0.4, FrontPanelEmbedmentDepth, thickness);
-                    translate([width/2-2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-                    translate([-width/2+2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-                    translate([width/2-2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
-                    translate([-width/2+2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepth+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                    layer(width,depth,thickness*4-0.4, thickness*4-0.4, FrontPanelEmbedmentDepthBot, thickness);
+                    translate([width/2-2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepthBot+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                    translate([-width/2+2*thickness,-depth/2+2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepthBot+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                    translate([width/2-2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepthBot+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
+                    translate([-width/2+2*thickness,depth/2-2*thickness,-0.1]) cylinder(h=FrontPanelEmbedmentDepthBot+0.2, d=FrontPanelScrewDia+0.2, center=false, $fn=60);
                 }
             }
 %        translate([width/2+1.0*thickness, depth/2+2*thickness,0]) rotate([60,0,0]) SealingTrowel();
